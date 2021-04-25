@@ -143,7 +143,7 @@ NumberWithUnits& NumberWithUnits::operator--(){   // prefix operator
 }
 NumberWithUnits NumberWithUnits::operator--(int){
     number-=1;
-    return NumberWithUnits{number,type};
+    return NumberWithUnits{number+1,type};
 }
 NumberWithUnits ariel::operator*(double num, const NumberWithUnits &oth_num){
     return NumberWithUnits{oth_num.number*num,oth_num.type};
@@ -155,11 +155,17 @@ std::ostream& ariel::operator<<(std::ostream &num, const NumberWithUnits &obj){
     return num<<obj.number<<"["<<obj.type<<"]";
 }
 std::istream& ariel::operator>>(std::istream &num, NumberWithUnits &obj){
-    string unit, check;
-    double number;
-    num >>number>>check>>unit>>check;
-    obj.number = number;
-    obj.type = unit;
+    string str, unit, check; // 3[cm]
+    double number_here;
+    num >> number_here;
+    getline(num, str,']'); //[cm]
+    str.erase(remove(str.begin(), str.end(), ' '), str.end());
+    str = str.substr(1,str.size()-1);
+    obj.number = number_here;
+    obj.type = str;
+    if(NumberWithUnits::units.find(str)== NumberWithUnits::units.end()){
+        throw invalid_argument("Type isn't exist in the units list!!");
+    }
     return num;
 }
 
